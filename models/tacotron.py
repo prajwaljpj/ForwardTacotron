@@ -346,6 +346,13 @@ class Tacotron(nn.Module):
 
         # Need a couple of lists for outputs
         mel_outputs, attn_scores = [], []
+        b, _, t_len = m.size()
+        if self.training and self.get_step() > 40_000:
+            if self.get_step() == 40_000:
+                print('Switching to mask!')
+            mask = (torch.rand(b, t_len, device=device) < 0.5).float()
+            avg_m = torch.mean(m)
+            m = m * mask[:, None, :] + avg_m * (1. - mask[:, None, :])
 
         # Run the decoder loop
         for t in range(0, steps, self.r):
