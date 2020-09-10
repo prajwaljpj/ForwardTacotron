@@ -57,13 +57,12 @@ def create_align_features(model: Tacotron,
         bs, chars = attn.shape[0], attn.shape[2]
         argmax = np.argmax(attn[:, :, :], axis=2)
         mel_counts = np.zeros(shape=(bs, chars), dtype=np.int32)
-        score = attention_score(torch.tensor(attn), x_lens, mel_lens, r=model.r)[0]
-        #score = float(score)
-        print(f'score {score}')
+        loc_score, sharp_score = attention_score(torch.tensor(attn), x_lens, mel_lens, r=model.r)
+        print(f'loc score {loc_score}, sharp score {sharp_score}')
         for b in range(attn.shape[0]):
             # fix random jumps in attention
             fig = plot_attention(attn[b, :])
-            plt.savefig(f'/tmp/att/{ids[b]}_score_new2_{float(score)}.png')
+            plt.savefig(f'/tmp/att/{ids[b]}_loc_{float(loc_score)}_sharp_{float(sharp_score)}.png')
             plt.close(fig)
 
             for j in range(1, argmax.shape[1]):
